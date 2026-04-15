@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+sales_bot.db
+digital_products/
+.vscode/

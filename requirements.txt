@@ -1,0 +1,7 @@
+python-telegram-bot==22.7
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+sqlalchemy>=2.0
+httpx>=0.24.0
+requests>=2.31.0
+qrcode>=7.3
