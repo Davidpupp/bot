@@ -64,6 +64,9 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+# Criar tabelas automaticamente se não existirem
+Base.metadata.create_all(engine)
+
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
