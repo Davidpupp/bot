@@ -344,15 +344,15 @@ def release_expired_reservations(db):
 
 def get_main_menu_keyboard(is_admin: bool = False):
     keyboard = [
-        [InlineKeyboardButton("📚 Catálogo", callback_data="catalog")],
-        [InlineKeyboardButton("🛒 Carrinho", callback_data="view_cart")],
-        [InlineKeyboardButton("📦 Meus Pedidos", callback_data="my_orders")],
-        [InlineKeyboardButton("� Categorias", callback_data="categories")],
-        [InlineKeyboardButton("👤 Minha Conta", callback_data="my_account")],
-        [InlineKeyboardButton("📞 Suporte", callback_data="support")]
+        [InlineKeyboardButton("⬛ Catálogo", callback_data="catalog")],
+        [InlineKeyboardButton("� Carrinho", callback_data="view_cart")],
+        [InlineKeyboardButton("� Pedidos", callback_data="my_orders")],
+        [InlineKeyboardButton("🗂 Categorias", callback_data="categories")],
+        [InlineKeyboardButton("👤 Conta", callback_data="my_account")],
+        [InlineKeyboardButton("� Suporte", callback_data="support")]
     ]
     if is_admin:
-        keyboard.append([InlineKeyboardButton("⚙️ Admin", callback_data="admin_panel")])
+        keyboard.append([InlineKeyboardButton("⚙ Admin", callback_data="admin_panel")])
     return InlineKeyboardMarkup(keyboard)
 
 def get_admin_keyboard():
@@ -370,17 +370,17 @@ def get_catalog_keyboard(products):
 
 def get_product_keyboard(product_id):
     keyboard = [
-        [InlineKeyboardButton("➕ Adicionar ao Carrinho", callback_data=f"add_to_cart_{product_id}")],
-        [InlineKeyboardButton("🔙 Voltar ao Catálogo", callback_data="catalog")]
+        [InlineKeyboardButton("⬛ Adicionar", callback_data=f"add_to_cart_{product_id}")],
+        [InlineKeyboardButton("🔙 Voltar", callback_data="catalog")]
     ]
     return InlineKeyboardMarkup(keyboard)
 
 def get_cart_keyboard():
     keyboard = [
         [InlineKeyboardButton("🔄 Atualizar", callback_data="view_cart")],
-        [InlineKeyboardButton("💳 Finalizar Compra", callback_data="checkout")],
-        [InlineKeyboardButton("🗑 Limpar Carrinho", callback_data="clear_cart")],
-        [InlineKeyboardButton("🔙 Menu Principal", callback_data="main_menu")]
+        [InlineKeyboardButton("⬛ Finalizar", callback_data="checkout")],
+        [InlineKeyboardButton("🗑 Limpar", callback_data="clear_cart")],
+        [InlineKeyboardButton("🔙 Menu", callback_data="main_menu")]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -410,20 +410,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             with open(banner_path, 'rb') as photo:
                 await update.message.reply_photo(
                     photo=photo,
-                    caption=f"👋 Olá {user.first_name}!\n\nBem-vindo à nossa loja.\nUse os botões abaixo para navegar.",
+                    caption=f"⬛ {user.first_name}\n\nAcesso concedido.\nUse os botões abaixo.",
                     reply_markup=get_main_menu_keyboard(is_admin)
                 )
         except Exception as e:
             logging.error(f"Erro ao enviar banner: {e}")
             # Fallback para mensagem de texto se falhar
             await update.message.reply_text(
-                f"👋 Olá {user.first_name}!\n\nBem-vindo à nossa loja.\nUse os botões abaixo para navegar.",
+                f"⬛ {user.first_name}\n\nAcesso concedido.\nUse os botões abaixo.",
                 reply_markup=get_main_menu_keyboard(is_admin)
             )
     else:
         # Mensagem padrão se não houver banner
         await update.message.reply_text(
-            f"👋 Olá {user.first_name}!\n\nBem-vindo à nossa loja.\nUse os botões abaixo para navegar.",
+            f"⬛ {user.first_name}\n\nAcesso concedido.\nUse os botões abaixo.",
             reply_markup=get_main_menu_keyboard(is_admin)
         )
 
@@ -708,15 +708,15 @@ async def checkout(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     context.user_data["pending_order_id"] = order.id
     
-    keyboard = [[InlineKeyboardButton("✅ Já paguei", callback_data=f"confirm_payment_{order.id}")]]
+    keyboard = [[InlineKeyboardButton("⬛ Confirmar", callback_data=f"confirm_payment_{order.id}")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await query.message.reply_text(
-        f"💳 *Pagamento PIX*\n\n"
+        f"⬛ *Pagamento PIX*\n\n"
         f"Pedido #{order.id}\n"
         f"Valor: {format_currency(total)}\n\n"
         f"Chave PIX:\n`{pix_key}`\n\n"
-        f"Faça o pagamento e clique em 'Já paguei' para enviar o comprovante.",
+        f"Após pagamento, clique abaixo.",
         parse_mode="Markdown",
         reply_markup=reply_markup
     )
@@ -732,13 +732,13 @@ async def confirm_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         order_id = int(query.data.split("_")[2])
     except:
-        await query.message.reply_text("❌ Erro ao identificar pedido.")
+        await query.message.reply_text(" Erro ao identificar pedido.")
         return
     
     context.user_data["awaiting_receipt"] = order_id
     await query.message.reply_text(
-        "📸 *Envie o comprovante de pagamento*\n\n"
-        "Por favor, envie uma foto ou documento do comprovante do PIX.",
+        " *Envie o comprovante*\n\n"
+        "Foto ou documento do comprovante PIX.",
         parse_mode="Markdown"
     )
 
@@ -754,7 +754,7 @@ async def receive_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     order = db.query(Order).filter(Order.id == order_id).first()
     
     if not order:
-        await update.message.reply_text("❌ Pedido não encontrado.")
+        await update.message.reply_text(" Pedido não encontrado.")
         db.close()
         return
     
@@ -766,10 +766,9 @@ async def receive_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Enviar mensagem para chamar @TK_O202
     await update.message.reply_text(
-        "✅ *Comprovante recebido!*\n\n"
-        "Para receber seu produto, entre em contato com:\n"
-        "@TK_O202\n\n"
-        "Mencione o número do pedido #" + str(order_id),
+        " *Comprovante recebido*\n\n"
+        "Contate @TK_O202 para entrega.\n\n"
+        "Pedido #" + str(order_id),
         parse_mode="Markdown"
     )
 
