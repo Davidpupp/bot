@@ -290,6 +290,46 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=get_main_menu_keyboard(is_admin)
         )
 
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    help_text = "*Central de Ajuda*\n\n"
+    help_text += "*Como comprar?*\n"
+    help_text += "1. Acesse o Catálogo e escolha seus produtos\n"
+    help_text += "2. Adicione ao carrinho\n"
+    help_text += "3. Finalize o pedido\n"
+    help_text += "4. Pague via PIX usando a chave fornecida\n"
+    help_text += "5. Envie o comprovante\n"
+    help_text += "6. Receba entrega via @TK_O202\n\n"
+    help_text += "*Formas de pagamento*\n"
+    help_text += "Aceitamos apenas PIX. O pagamento deve ser feito em até 30 minutos após o pedido.\n\n"
+    help_text += "*Entrega*\n"
+    help_text += "Após confirmação do pagamento, contate @TK_O202 para entrega.\n"
+    help_text += "Tempo médio de entrega: até 24 horas.\n\n"
+    help_text += "*Suporte*\n"
+    help_text += "Dúvidas? Contate @TK_O202\n\n"
+    help_text += "*Política de reembolso*\n"
+    help_text += "Produtos digitais não possuem reembolso após entrega.\n"
+    await update.message.reply_text(help_text, parse_mode="Markdown", reply_markup=get_main_menu_keyboard(False))
+
+async def terms_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    terms_text = "*Termos de Uso e Política de Privacidade*\n\n"
+    terms_text += "*Produtos Digitais*\n"
+    terms_text += "Todos os produtos vendidos são de natureza digital.\n"
+    terms_text += "Ao comprar, você concorda que os produtos são fornecidos 'como estão'.\n\n"
+    terms_text += "*Privacidade*\n"
+    terms_text += "Seus dados são protegidos e usados apenas para processamento de pedidos.\n"
+    terms_text += "Não compartilhamos informações com terceiros.\n\n"
+    terms_text += "*Pagamento*\n"
+    terms_text += "Pagamentos são processados via PIX.\n"
+    terms_text += "Pedidos não pagos em 30 minutos são cancelados automaticamente.\n\n"
+    terms_text += "*Entrega*\n"
+    terms_text += "A entrega é feita manualmente após confirmação do pagamento.\n"
+    terms_text += "Contate @TK_O202 para receber seus produtos.\n\n"
+    terms_text += "*Reembolsos*\n"
+    terms_text += "Produtos digitais não possuem reembolso após entrega.\n\n"
+    terms_text += "*Contato*\n"
+    terms_text += "Para dúvidas: @TK_O202"
+    await update.message.reply_text(terms_text, parse_mode="Markdown", reply_markup=get_main_menu_keyboard(False))
+
 async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
