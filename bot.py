@@ -888,6 +888,8 @@ def main():
     app.bot_data["admin_ids"] = ADMIN_IDS
     
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("help", help_command))
+    app.add_handler(CommandHandler("terms", terms_command))
     app.add_handler(CommandHandler("admin", admin_panel))
     app.add_handler(CallbackQueryHandler(catalog, pattern="^catalog$"))
     app.add_handler(CallbackQueryHandler(product_detail, pattern=r"^product_(\d+)$"))
