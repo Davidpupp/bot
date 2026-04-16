@@ -1212,6 +1212,9 @@ def run_webhook():
 # ======================= INICIALIZAÇÃO DE PRODUTOS DE TESTE =======================
 def create_test_products():
     """Cria produtos de teste se a tabela estiver vazia"""
+    # Criar tabelas se não existirem
+    Base.metadata.create_all(engine)
+    
     db = SessionLocal()
     
     # Verifica se já existem produtos
