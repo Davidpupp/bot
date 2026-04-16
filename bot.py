@@ -13,15 +13,12 @@ from io import BytesIO
 from datetime import datetime, timedelta
 from typing import Optional, Tuple
 
-# Carregar variáveis de ambiente do arquivo config.env
+# Carregar variáveis de ambiente (Railway usa variáveis de ambiente do sistema)
 try:
     from dotenv import load_dotenv
-    load_dotenv('config.env')
-    print("OK Configuracoes carregadas do config.env")
+    load_dotenv()  # Carrega .env se existir localmente, mas não falha se não existir
 except ImportError:
-    print("AVISO: python-dotenv nao instalado, usando variaveis de ambiente do sistema")
-except Exception as e:
-    print(f"AVISO: Erro ao carregar config.env: {e}")
+    pass  # python-dotenv não é obrigatório para Railway
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
