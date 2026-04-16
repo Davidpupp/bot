@@ -702,54 +702,76 @@ async def checkout(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if p.stock is not None:
                 p.stock -= qty
     db.commit()
-    payment_data = create_payment(amount=total, order_id=order.id, user_email=db_user.email, payment_method="pix")
     
-    # Verificar se está em modo de simulação
-    if payment_data.get("simulation"):
-        await query.message.reply_text(
-            f"**MODO DE TESTE**\n\n"
-            f"Pedido #{order.id} criado!\n"
-            f"Valor: {format_currency(total)}\n\n"
-            f"Como não há gateway configurado, use:\n"
-            f"`/pagar {order.id}` para simular pagamento\n\n"
-            f"O produto só será entregue após aprovação!"
-        )
-        order.payment_id = payment_data.get("id")
-        db.commit()
-        db.close()
-        context.user_data["cart"] = {}
-        await query.message.reply_text("Pedido criado! Aguardando pagamento.", reply_markup=get_main_menu_keyboard(db_user.is_admin))
-        return
+    # Chave PIX fixa para pagamento manual
+    pix_key = "00020101021126580014br.gov.bcb.pix0136ef03c58f-5ee1-46e7-b7f3-7bf3912c045b5204000053039865802BR5922DAVI LUZ FERREIRA PUPP6008SOROCABA62070503***6304769E"
     
-    if "error" in payment_data:
-        await query.message.reply_text(f"Erro ao gerar pagamento: {payment_data['error']}")
-        for item in order.items:
-            prod = db.query(Product).filter(Product.id == item.product_id).first()
-            if prod and prod.stock is not None:
-                prod.stock += item.quantity
-        order.status = "cancelled"
-        order.delivery_status = "cancelled"
-        db.commit()
-        db.close()
-        return
+    context.user_data["pending_order_id"] = order.id
     
-    payment_id = payment_data.get("id")
-    if payment_id:
-        order.payment_id = payment_id
-    qr_base64, copy_paste = extract_pix_info(payment_data)
-    order.payment_qr_base64 = qr_base64
-    order.payment_copy_paste = copy_paste
-    db.commit()
+    keyboard = [[InlineKeyboardButton("✅ Já paguei", callback_data=f"confirm_payment_{order.id}")]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await query.message.reply_text(
+        f"💳 *Pagamento PIX*\n\n"
+        f"Pedido #{order.id}\n"
+        f"Valor: {format_currency(total)}\n\n"
+        f"Chave PIX:\n`{pix_key}`\n\n"
+        f"Faça o pagamento e clique em 'Já paguei' para enviar o comprovante.",
+        parse_mode="Markdown",
+        reply_markup=reply_markup
+    )
+    
+    context.user_data["cart"] = {}
     db.close()
 
-    await send_pix_instructions(
-        chat_id=user_id,
-        caption=f"PIX - Pedido #{order.id}\nValor: {format_currency(total)}\n\nApós o pagamento, o produto será enviado.",
-        qr_base64=qr_base64,
-        copy_paste=copy_paste,
+async def confirm_payment(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handler para botão 'Já paguei' - pede comprovante"""
+    query = update.callback_query
+    await query.answer()
+    
+    try:
+        order_id = int(query.data.split("_")[2])
+    except:
+        await query.message.reply_text("❌ Erro ao identificar pedido.")
+        return
+    
+    context.user_data["awaiting_receipt"] = order_id
+    await query.message.reply_text(
+        "📸 *Envie o comprovante de pagamento*\n\n"
+        "Por favor, envie uma foto ou documento do comprovante do PIX.",
+        parse_mode="Markdown"
     )
-    context.user_data["cart"] = {}
-    await query.message.reply_text("✅ Pedido finalizado! Em breve você receberá a confirmação.", reply_markup=get_main_menu_keyboard(db_user.is_admin))
+
+async def receive_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handler para receber comprovante de pagamento"""
+    if "awaiting_receipt" not in context.user_data:
+        return
+    
+    order_id = context.user_data["awaiting_receipt"]
+    del context.user_data["awaiting_receipt"]
+    
+    db = SessionLocal()
+    order = db.query(Order).filter(Order.id == order_id).first()
+    
+    if not order:
+        await update.message.reply_text("❌ Pedido não encontrado.")
+        db.close()
+        return
+    
+    # Marcar pedido como pago
+    order.status = "paid"
+    order.delivery_status = "processing"
+    db.commit()
+    db.close()
+    
+    # Enviar mensagem para chamar @TK_O202
+    await update.message.reply_text(
+        "✅ *Comprovante recebido!*\n\n"
+        "Para receber seu produto, entre em contato com:\n"
+        "@TK_O202\n\n"
+        "Mencione o número do pedido #" + str(order_id),
+        parse_mode="Markdown"
+    )
 
 async def my_orders(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -1308,6 +1330,8 @@ def main():
     app.add_handler(CallbackQueryHandler(view_cart, pattern="^view_cart$"))
     app.add_handler(CallbackQueryHandler(clear_cart, pattern="^clear_cart$"))
     app.add_handler(CallbackQueryHandler(checkout, pattern="^checkout$"))
+    app.add_handler(CallbackQueryHandler(confirm_payment, pattern=r"^confirm_payment_"))
+    app.add_handler(MessageHandler(filters.PHOTO | filters.Document.ALL, receive_receipt))
     app.add_handler(CallbackQueryHandler(my_orders, pattern="^my_orders$"))
     app.add_handler(CallbackQueryHandler(support, pattern="^support$"))
     app.add_handler(CallbackQueryHandler(my_account, pattern="^my_account$"))
