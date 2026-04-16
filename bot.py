@@ -10,7 +10,19 @@ import logging
 import base64
 import threading
 from io import BytesIO
-from datetime import datetime
+from datetime import datetime, timedelta
+from typing import Optional, Tuple
+
+# Carregar variáveis de ambiente do arquivo config.env
+try:
+    from dotenv import load_dotenv
+    load_dotenv('config.env')
+    print("OK Configuracoes carregadas do config.env")
+except ImportError:
+    print("AVISO: python-dotenv nao instalado, usando variaveis de ambiente do sistema")
+except Exception as e:
+    print(f"AVISO: Erro ao carregar config.env: {e}")
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application, CommandHandler, CallbackQueryHandler, MessageHandler,
@@ -18,10 +30,15 @@ from telegram.ext import (
 )
 from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+import uuid
+import random
+from decimal import Decimal
 import requests
 from fastapi import FastAPI, Request, BackgroundTasks
 import uvicorn
 import httpx
+
+print("OK Funcionalidades avancadas integradas com sucesso!")
 
 # ======================= CONFIGURAÇÃO / AMBIENTE =======================
 # Use variáveis de ambiente para deploy em serviços gratuitos como Railway, Render, Fly.io, etc.
@@ -60,6 +77,7 @@ class User(Base):
     is_admin = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     orders = relationship("Order", back_populates="user")
+    loyalty = relationship("LoyaltyPoints", back_populates="user")
 
 class Product(Base):
     __tablename__ = "products"
@@ -67,9 +85,17 @@ class Product(Base):
     name = Column(String, index=True)
     description = Column(Text)
     price = Column(Float)
+    stock = Column(Integer, default=999999)
     digital_file = Column(String, nullable=True)
     is_available = Column(Boolean, default=True)
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
+    tags = Column(Text, nullable=True)  # JSON de tags
+    view_count = Column(Integer, default=0)
+    purchase_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
     orders = relationship("OrderItem", back_populates="product")
+    category = relationship("Category", back_populates="products")
 
 class Order(Base):
     __tablename__ = "orders"
@@ -78,6 +104,10 @@ class Order(Base):
     total_price = Column(Float)
     status = Column(String, default="pending")
     payment_id = Column(String, nullable=True)
+    payment_qr_base64 = Column(Text, nullable=True)
+    payment_copy_paste = Column(Text, nullable=True)
+    reserved_until = Column(DateTime, nullable=True)
+    delivered_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     user = relationship("User", back_populates="orders")
     items = relationship("OrderItem", back_populates="order")
@@ -92,12 +122,72 @@ class OrderItem(Base):
     order = relationship("Order", back_populates="items")
     product = relationship("Product", back_populates="orders")
 
-Base.metadata.create_all(bind=engine)
+class Category(Base):
+    __tablename__ = "categories"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True, index=True)
+    description = Column(Text, nullable=True)
+    icon = Column(String, nullable=True)  # Emoji para categoria
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    products = relationship("Product", back_populates="category")
+
+class DiscountCode(Base):
+    __tablename__ = "discount_codes"
+    id = Column(Integer, primary_key=True)
+    code = Column(String, unique=True, index=True)
+    discount_type = Column(String, default="percentage")  # percentage or fixed
+    discount_value = Column(Float)
+    min_purchase = Column(Float, default=0.0)
+    max_discount = Column(Float, nullable=True)
+    usage_limit = Column(Integer, nullable=True)
+    usage_count = Column(Integer, default=0)
+    expires_at = Column(DateTime, nullable=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+class LoyaltyPoints(Base):
+    __tablename__ = "loyalty_points"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    points = Column(Integer, default=0)
+    points_earned = Column(Integer, default=0)
+    points_spent = Column(Integer, default=0)
+    level = Column(String, default="Bronze")  # Bronze, Prata, Ouro
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
+    user = relationship("User", back_populates="loyalty")
+
+class Analytics(Base):
+    __tablename__ = "analytics"
+    id = Column(Integer, primary_key=True)
+    event_type = Column(String, index=True)  # view, add_to_cart, purchase, etc.
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=True)
+    order_id = Column(Integer, ForeignKey("orders.id"), nullable=True)
+    value = Column(Float, nullable=True)  # valor da transação
+    extra_data = Column(Text, nullable=True)  # dados adicionais em JSON
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class MarketingCampaign(Base):
+    __tablename__ = "marketing_campaigns"
+    id = Column(Integer, primary_key=True)
+    name = Column(String, index=True)
+    message = Column(Text)
+    target_audience = Column(String, default="all")  # all, vip, new_users, inactive
+    send_at = Column(DateTime, nullable=True)
+    sent_at = Column(DateTime, nullable=True)
+    status = Column(String, default="pending")  # pending, sent, failed
+    opens_count = Column(Integer, default=0)
+    clicks_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    created_by = Column(Integer, ForeignKey("users.id"))
 
 # ======================= GATEWAY DE PAGAMENTO =======================
 class MercadoPagoGateway:
     @staticmethod
-    def create_payment(amount: float, order_id: int, user_email: str = None):
+    def create_payment(amount: float, order_id: int, user_email: str = None, payment_method: str = "pix"):
         if not MP_ACCESS_TOKEN:
             return {"error": "MP_ACCESS_TOKEN não configurado"}
         headers = {"Authorization": f"Bearer {MP_ACCESS_TOKEN}", "Content-Type": "application/json"}
@@ -115,11 +205,11 @@ class MercadoPagoGateway:
 
 class SillientPayGateway:
     @staticmethod
-    def create_payment(amount: float, order_id: int, user_email: str = None):
+    def create_payment(amount: float, order_id: int, user_email: str = None, payment_method: str = "pix"):
         """Cria pagamento real via SillientPay API"""
         import httpx
 
-        url = "https://api.sillientpay.com/v1/payments"
+        url = "https://api.sillientpay.com/v1/pix"
         headers = {
             "Authorization": f"Bearer {SILLIENTPAY_API_KEY}",
             "Content-Type": "application/json"
@@ -154,25 +244,112 @@ class SillientPayGateway:
             logging.error(f"❌ Erro geral SillientPay: {e}")
             return {"error": str(e)}
 
-def create_payment(amount: float, order_id: int, user_email: str = None):
+def create_payment(amount: float, order_id: int, user_email: str = None, payment_method: str = "pix"):
     if SILLIENTPAY_API_KEY:
-        return SillientPayGateway.create_payment(amount, order_id, user_email)
+        return SillientPayGateway.create_payment(amount, order_id, user_email, payment_method)
     elif MP_ACCESS_TOKEN:
-        return MercadoPagoGateway.create_payment(amount, order_id, user_email)
+        return MercadoPagoGateway.create_payment(amount, order_id, user_email, payment_method)
     else:
-        return {"error": "Nenhum gateway configurado"}
+        # Simulação para testes - não gera pagamento real
+        return {
+            "id": f"SIM_{order_id}",
+            "status": "pending",
+            "qrCode": None,  # Sem QR code em modo de teste
+            "brCode": None,  # Sem código copia-e-cola em modo de teste
+            "simulation": True
+        }
 
 # ======================= UTILIDADES =======================
 def format_currency(value: float) -> str:
     return f"R$ {value:.2f}".replace(".", ",")
+
+def extract_pix_info(payment_data: dict) -> Tuple[Optional[str], Optional[str]]:
+    qr_base64 = (
+        payment_data.get("qrCode")
+        or payment_data.get("qr_code_base64")
+        or payment_data.get("qrCodeBase64")
+        or payment_data.get("point_of_interaction", {})
+        .get("transaction_data", {})
+        .get("qr_code_base64")
+    )
+
+    copy_paste = (
+        payment_data.get("brCode")
+        or payment_data.get("br_code")
+        or payment_data.get("copyPaste")
+        or payment_data.get("copy_paste")
+        or payment_data.get("copiaECola")
+        or payment_data.get("pixCopyPaste")
+        or payment_data.get("point_of_interaction", {})
+        .get("transaction_data", {})
+        .get("qr_code")
+    )
+
+    if isinstance(qr_base64, dict):
+        qr_base64 = None
+    if isinstance(copy_paste, dict):
+        copy_paste = None
+
+    return qr_base64, copy_paste
+
+async def send_telegram_message(chat_id: int, text: str):
+    """Envia mensagem via API do Telegram"""
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    async with httpx.AsyncClient() as client:
+        await client.post(url, json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"})
+
+async def send_pix_instructions(
+    *,
+    chat_id: int,
+    caption: str,
+    qr_base64: Optional[str],
+    copy_paste: Optional[str],
+):
+    if qr_base64:
+        try:
+            qr_bytes = base64.b64decode(qr_base64)
+            url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
+            async with httpx.AsyncClient() as client:
+                files = {"photo": ("pix.png", qr_bytes)}
+                data = {"chat_id": chat_id, "caption": caption}
+                await client.post(url, data=data, files=files)
+        except Exception:
+            await send_telegram_message(chat_id, caption)
+    else:
+        await send_telegram_message(chat_id, caption)
+
+    if copy_paste:
+        await send_telegram_message(chat_id, f"📋 PIX Copia e Cola:\n`{copy_paste}`")
+
+def release_expired_reservations(db):
+    now = datetime.utcnow()
+    expired = (
+        db.query(Order)
+        .filter(Order.status == "reserved")
+        .filter(Order.reserved_until != None)
+        .filter(Order.reserved_until < now)
+        .all()
+    )
+    if not expired:
+        return
+
+    for order in expired:
+        for item in order.items:
+            product = db.query(Product).filter(Product.id == item.product_id).first()
+            if product and product.stock is not None:
+                product.stock += item.quantity
+        order.status = "cancelled"
+        order.delivery_status = "cancelled"
+    db.commit()
 
 def get_main_menu_keyboard(is_admin: bool = False):
     keyboard = [
         [InlineKeyboardButton("📚 Catálogo", callback_data="catalog")],
         [InlineKeyboardButton("🛒 Carrinho", callback_data="view_cart")],
         [InlineKeyboardButton("📦 Meus Pedidos", callback_data="my_orders")],
-        [InlineKeyboardButton("📞 Suporte", callback_data="support")],
-        [InlineKeyboardButton("👤 Minha Conta", callback_data="my_account")]
+        [InlineKeyboardButton("� Categorias", callback_data="categories")],
+        [InlineKeyboardButton("👤 Minha Conta", callback_data="my_account")],
+        [InlineKeyboardButton("📞 Suporte", callback_data="support")]
     ]
     if is_admin:
         keyboard.append([InlineKeyboardButton("⚙️ Admin", callback_data="admin_panel")])
@@ -225,10 +402,30 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         db.commit()
     is_admin = db_user.is_admin
     db.close()
-    await update.message.reply_text(
-        f"🎉 Olá {user.first_name}!\n\nBem-vindo à nossa loja.\nUse os botões abaixo para navegar.",
-        reply_markup=get_main_menu_keyboard(is_admin)
-    )
+    
+    # Enviar banner de boas-vindas (se existir)
+    banner_path = "banners/welcome_banner.jpg"
+    if os.path.exists(banner_path):
+        try:
+            with open(banner_path, 'rb') as photo:
+                await update.message.reply_photo(
+                    photo=photo,
+                    caption=f"👋 Olá {user.first_name}!\n\nBem-vindo à nossa loja.\nUse os botões abaixo para navegar.",
+                    reply_markup=get_main_menu_keyboard(is_admin)
+                )
+        except Exception as e:
+            logging.error(f"Erro ao enviar banner: {e}")
+            # Fallback para mensagem de texto se falhar
+            await update.message.reply_text(
+                f"👋 Olá {user.first_name}!\n\nBem-vindo à nossa loja.\nUse os botões abaixo para navegar.",
+                reply_markup=get_main_menu_keyboard(is_admin)
+            )
+    else:
+        # Mensagem padrão se não houver banner
+        await update.message.reply_text(
+            f"👋 Olá {user.first_name}!\n\nBem-vindo à nossa loja.\nUse os botões abaixo para navegar.",
+            reply_markup=get_main_menu_keyboard(is_admin)
+        )
 
 async def teste(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Comando de teste simples"""
@@ -239,6 +436,7 @@ async def teste_pagamento(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         # Criar pedido de teste
         db = SessionLocal()
+        release_expired_reservations(db)
         user = db.query(User).filter(User.telegram_id == update.effective_user.id).first()
         if not user:
             await update.message.reply_text("❌ Usuário não encontrado.")
@@ -247,9 +445,8 @@ async def teste_pagamento(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Criar pedido de teste com R$ 0,10
         order = Order(
             user_id=user.id,
-            total_amount=0.10,
-            status="pending",
-            payment_method="sillientpay"
+            total_price=0.10,
+            status="pending"
         )
         db.add(order)
         db.commit()
@@ -260,19 +457,27 @@ async def teste_pagamento(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if "error" in payment_result:
             await update.message.reply_text(f"❌ Erro no pagamento: {payment_result['error']}")
         else:
-            qr_code = payment_result.get("qrCode", "QR Code não disponível")
+            qr_base64, copy_paste = extract_pix_info(payment_result)
             payment_id = payment_result.get("id", "N/A")
 
             # Atualizar pedido com payment_id
             order.payment_id = payment_id
+            order.payment_qr_base64 = qr_base64
+            order.payment_copy_paste = copy_paste
             db.commit()
 
             await update.message.reply_text(
                 f"💳 Pagamento de teste criado!\n\n"
                 f"📄 ID: {payment_id}\n"
                 f"💰 Valor: R$ 0,10\n"
-                f"📱 QR Code: {qr_code[:50]}...\n\n"
                 f"Use /pagar {order.id} para simular aprovação."
+            )
+
+            await send_pix_instructions(
+                chat_id=update.effective_user.id,
+                caption=f"💰 PIX - Pedido #{order.id}\nValor: {format_currency(order.total_price)}\n\nApós o pagamento, o produto será enviado.",
+                qr_base64=qr_base64,
+                copy_paste=copy_paste,
             )
 
         db.close()
@@ -303,6 +508,7 @@ async def pagar(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Simular aprovação do pagamento
         order.status = "paid"
+        order.delivery_status = "processing"
         db.commit()
 
         # Entregar produto
@@ -313,7 +519,7 @@ async def pagar(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
             f"🎉 Pagamento aprovado!\n\n"
             f"📦 Pedido #{order.id}\n"
-            f"💰 Valor: R$ {order.total_amount:.2f}\n"
+            f"💰 Valor: {format_currency(order.total_price)}\n"
             f"✅ Status: Pago\n\n"
             f"📧 Produto enviado para seu e-mail!"
         )
@@ -331,7 +537,11 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db_user = db.query(User).filter(User.telegram_id == user_id).first()
     is_admin = db_user.is_admin if db_user else False
     db.close()
-    await query.edit_message_text("Menu Principal:", reply_markup=get_main_menu_keyboard(is_admin))
+    try:
+        await query.edit_message_text("Menu Principal:", reply_markup=get_main_menu_keyboard(is_admin))
+    except Exception as e:
+        # If edit fails, send new message
+        await query.message.reply_text("Menu Principal:", reply_markup=get_main_menu_keyboard(is_admin))
 
 async def catalog(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -340,44 +550,71 @@ async def catalog(update: Update, context: ContextTypes.DEFAULT_TYPE):
     products = db.query(Product).filter(Product.is_available == True).all()
     db.close()
     if not products:
-        await query.edit_message_text("📭 Nenhum produto disponível no momento.")
+        await query.edit_message_text("📭 Nenhum produto disponível no momento.", reply_markup=get_main_menu_keyboard(False))
         return
     text = "📚 *Catálogo de Produtos*\n\n" + "\n".join(f"*{p.name}*\n💰 {format_currency(p.price)}\n" for p in products)
-    await query.edit_message_text(text, parse_mode="Markdown", reply_markup=get_catalog_keyboard(products))
+    try:
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=get_catalog_keyboard(products))
+    except Exception as e:
+        # If edit fails, send new message
+        await query.message.reply_text(text, parse_mode="Markdown", reply_markup=get_catalog_keyboard(products))
 
 async def product_detail(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     try:
-        product_id = int(query.data.split("_")[1])
-    except:
+        parts = query.data.split("_")
+        product_id = int(parts[1])
+    except Exception as e:
+        await query.message.reply_text(f"❌ Erro ao identificar produto: {str(e)}")
         return
+    
     db = SessionLocal()
     product = db.query(Product).filter(Product.id == product_id).first()
     db.close()
     if not product:
-        await query.edit_message_text("Produto não encontrado.")
+        await query.message.reply_text("❌ Produto não encontrado.")
         return
+    
     text = f"*{product.name}*\n\n{product.description}\n\n💰 {format_currency(product.price)}"
-    await query.edit_message_text(text, parse_mode="Markdown", reply_markup=get_product_keyboard(product.id))
+    try:
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=get_product_keyboard(product.id))
+    except Exception as e:
+        # If edit fails, send new message
+        await query.message.reply_text(text, parse_mode="Markdown", reply_markup=get_product_keyboard(product.id))
 
 async def add_to_cart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     try:
-        product_id = int(query.data.split("_")[3])
-    except:
-        await query.edit_message_text("Erro ao adicionar produto.")
+        # Extract product ID from callback_data
+        parts = query.data.split("_")
+        if len(parts) >= 4:
+            product_id = int(parts[3])
+        else:
+            product_id = int(parts[2]) if len(parts) >= 3 else None
+        
+        if product_id is None:
+            await query.message.reply_text("❌ Erro ao identificar produto.")
+            return
+    except Exception as e:
+        await query.message.reply_text(f"❌ Erro: {str(e)}")
         return
+    
     cart = context.user_data.get("cart", {})
     cart[product_id] = cart.get(product_id, 0) + 1
     context.user_data["cart"] = cart
-    await query.edit_message_text("✅ Produto adicionado ao carrinho!")
+    
+    # Send confirmation as new message to avoid edit conflicts
+    await query.message.reply_text("✅ Produto adicionado ao carrinho!")
+    
     user_id = query.from_user.id
     db = SessionLocal()
     db_user = db.query(User).filter(User.telegram_id == user_id).first()
     is_admin = db_user.is_admin if db_user else False
     db.close()
+    
+    # Send menu as new message
     await query.message.reply_text("Use o menu para continuar ou finalizar.", reply_markup=get_main_menu_keyboard(is_admin))
 
 async def view_cart(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -385,8 +622,12 @@ async def view_cart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     cart = context.user_data.get("cart", {})
     if not cart:
-        await query.edit_message_text("🛒 Seu carrinho está vazio.")
+        try:
+            await query.edit_message_text("🛒 Seu carrinho está vazio.", reply_markup=get_main_menu_keyboard(False))
+        except:
+            await query.message.reply_text("🛒 Seu carrinho está vazio.", reply_markup=get_main_menu_keyboard(False))
         return
+    
     db = SessionLocal()
     total = 0
     text = "🛒 *Seu Carrinho*\n\n"
@@ -398,13 +639,22 @@ async def view_cart(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text += f"{product.name} x{qty} = {format_currency(subtotal)}\n"
     db.close()
     text += f"\n*Total: {format_currency(total)}*"
-    await query.edit_message_text(text, parse_mode="Markdown", reply_markup=get_cart_keyboard())
+    
+    try:
+        await query.edit_message_text(text, parse_mode="Markdown", reply_markup=get_cart_keyboard())
+    except Exception as e:
+        # If edit fails, send new message
+        await query.message.reply_text(text, parse_mode="Markdown", reply_markup=get_cart_keyboard())
 
 async def clear_cart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     context.user_data["cart"] = {}
-    await query.edit_message_text("🗑 Carrinho limpo!", reply_markup=get_main_menu_keyboard(False))
+    try:
+        await query.edit_message_text("🗑 Carrinho limpo!", reply_markup=get_main_menu_keyboard(False))
+    except Exception as e:
+        # If edit fails, send new message
+        await query.message.reply_text("🗑 Carrinho limpo!", reply_markup=get_main_menu_keyboard(False))
 
 async def checkout(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -416,12 +666,32 @@ async def checkout(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     db = SessionLocal()
     db_user = db.query(User).filter(User.telegram_id == user_id).first()
+    release_expired_reservations(db)
+    if not db_user:
+        await query.message.reply_text("❌ Usuário não encontrado.")
+        db.close()
+        return
     total = 0
     for pid, qty in cart.items():
         p = db.query(Product).filter(Product.id == pid).first()
         if p:
+            if not p.is_available:
+                await query.message.reply_text(f"❌ Produto indisponível: {p.name}")
+                db.close()
+                return
+            if p.stock is not None and p.stock < qty:
+                await query.message.reply_text(f"❌ Sem estoque para {p.name}. Disponível: {p.stock}")
+                db.close()
+                return
             total += p.price * qty
-    order = Order(user_id=db_user.id, total_price=total, status="pending")
+
+    order = Order(
+        user_id=db_user.id,
+        total_price=total,
+        status="reserved",
+        reserved_until=datetime.utcnow() + timedelta(minutes=30),
+        delivery_status="pending",
+    )
     db.add(order)
     db.commit()
     for pid, qty in cart.items():
@@ -429,23 +699,55 @@ async def checkout(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if p:
             item = OrderItem(order_id=order.id, product_id=pid, quantity=qty, price=p.price)
             db.add(item)
+            if p.stock is not None:
+                p.stock -= qty
     db.commit()
-    payment_data = create_payment(amount=total, order_id=order.id, user_email=db_user.email)
+    payment_data = create_payment(amount=total, order_id=order.id, user_email=db_user.email, payment_method="pix")
+    
+    # Verificar se está em modo de simulação
+    if payment_data.get("simulation"):
+        await query.message.reply_text(
+            f"**MODO DE TESTE**\n\n"
+            f"Pedido #{order.id} criado!\n"
+            f"Valor: {format_currency(total)}\n\n"
+            f"Como não há gateway configurado, use:\n"
+            f"`/pagar {order.id}` para simular pagamento\n\n"
+            f"O produto só será entregue após aprovação!"
+        )
+        order.payment_id = payment_data.get("id")
+        db.commit()
+        db.close()
+        context.user_data["cart"] = {}
+        await query.message.reply_text("Pedido criado! Aguardando pagamento.", reply_markup=get_main_menu_keyboard(db_user.is_admin))
+        return
+    
     if "error" in payment_data:
-        await query.message.reply_text(f"❌ Erro ao gerar pagamento: {payment_data['error']}")
+        await query.message.reply_text(f"Erro ao gerar pagamento: {payment_data['error']}")
+        for item in order.items:
+            prod = db.query(Product).filter(Product.id == item.product_id).first()
+            if prod and prod.stock is not None:
+                prod.stock += item.quantity
+        order.status = "cancelled"
+        order.delivery_status = "cancelled"
+        db.commit()
         db.close()
         return
+    
     payment_id = payment_data.get("id")
     if payment_id:
         order.payment_id = payment_id
-        db.commit()
+    qr_base64, copy_paste = extract_pix_info(payment_data)
+    order.payment_qr_base64 = qr_base64
+    order.payment_copy_paste = copy_paste
+    db.commit()
     db.close()
-    qr_code = payment_data.get("point_of_interaction", {}).get("transaction_data", {}).get("qr_code_base64")
-    if qr_code:
-        qr_bytes = base64.b64decode(qr_code)
-        await query.message.reply_photo(photo=BytesIO(qr_bytes), caption=f"💰 PIX - Pedido #{order.id}\nValor: {format_currency(total)}\n\nApós o pagamento, o produto será enviado.")
-    else:
-        await query.message.reply_text(f"💰 Pedido #{order.id} gerado!\nValor: {format_currency(total)}\n\nAguardando confirmação de pagamento.")
+
+    await send_pix_instructions(
+        chat_id=user_id,
+        caption=f"PIX - Pedido #{order.id}\nValor: {format_currency(total)}\n\nApós o pagamento, o produto será enviado.",
+        qr_base64=qr_base64,
+        copy_paste=copy_paste,
+    )
     context.user_data["cart"] = {}
     await query.message.reply_text("✅ Pedido finalizado! Em breve você receberá a confirmação.", reply_markup=get_main_menu_keyboard(db_user.is_admin))
 
@@ -489,6 +791,136 @@ async def my_account(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = f"👤 *Minha Conta*\n\nNome: {db_user.first_name}\nUsername: @{db_user.username or 'não definido'}\nE-mail: {db_user.email or 'não informado'}"
         await query.edit_message_text(text, parse_mode="Markdown", reply_markup=get_main_menu_keyboard(db_user.is_admin))
     db.close()
+
+# ------------------- FUNCIONALIDADES AVANCADAS -------------------
+async def categories_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Menu de categorias"""
+    query = update.callback_query
+    await query.answer()
+    db = SessionLocal()
+    categories = db.query(Category).filter(Category.is_active == True).all()
+    db.close()
+    
+    if not categories:
+        await query.edit_message_text(
+            "📂 Nenhuma categoria disponível no momento.\n\nVolte mais tarde!",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔙 Menu Principal", callback_data="main_menu")]
+            ])
+        )
+        return
+    
+    keyboard = [[InlineKeyboardButton(f"{cat.icon or '📂'} {cat.name}", callback_data=f"category_{cat.id}")] for cat in categories]
+    keyboard.append([InlineKeyboardButton("🔙 Menu Principal", callback_data="main_menu")])
+    
+    await query.edit_message_text(
+        "📂 *Categorias de Produtos*\n\nEscolha uma categoria:",
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+async def show_categories(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Mostra produtos por categoria"""
+    query = update.callback_query
+    await query.answer()
+    
+    try:
+        category_id = int(query.data.split("_")[1])
+    except:
+        await query.edit_message_text("❌ Categoria inválida.")
+        return
+    
+    db = SessionLocal()
+    category = db.query(Category).filter(Category.id == category_id).first()
+    if not category:
+        db.close()
+        await query.edit_message_text("❌ Categoria não encontrada.")
+        return
+    
+    products = db.query(Product).filter(
+        Product.category_id == category_id,
+        Product.is_available == True
+    ).all()
+    db.close()
+    
+    if not products:
+        await query.edit_message_text(f"📂 Nenhum produto na categoria {category.icon or '📂'} {category.name}.")
+        return
+    
+    text = f"{category.icon or '📂'} *{category.name}*\n\n"
+    for p in products:
+        text += f"*{p.name}*\n💰 {format_currency(p.price)}\n\n"
+    
+    keyboard = [[InlineKeyboardButton(p.name, callback_data=f"product_{p.id}")] for p in products]
+    keyboard.append([InlineKeyboardButton("🔙 Voltar", callback_data="categories")])
+    keyboard.append([InlineKeyboardButton("🏠 Menu Principal", callback_data="main_menu")])
+    
+    await query.edit_message_text(text, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def view_loyalty(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Ver pontos de fidelidade do usuário"""
+    query = update.callback_query
+    await query.answer()
+    
+    user_id = update.effective_user.id
+    db = SessionLocal()
+    loyalty = db.query(LoyaltyPoints).filter(LoyaltyPoints.user_id == user_id).first()
+    db.close()
+    
+    if not loyalty:
+        points = 0
+        level = "Bronze"
+        next_level = "Prata"
+        points_needed = 500
+    else:
+        points = loyalty.points
+        level = loyalty.level
+        if level == "Bronze":
+            next_level = "Prata"
+            points_needed = max(0, 500 - loyalty.points_earned)
+        elif level == "Prata":
+            next_level = "Ouro"
+            points_needed = max(0, 1000 - loyalty.points_earned)
+        else:
+            next_level = "Ouro"
+            points_needed = 0
+    
+    text = f"⭐ *Meus Pontos de Fidelidade*\n\n"
+    text += f"🏆 *Nível Atual:* {level}\n"
+    text += f"💎 *Pontos Atuais:* {points}\n"
+    text += f"📈 *Próximo Nível:* {next_level}\n"
+    text += f"🎯 *Pontos Necessários:* {points_needed}\n\n"
+    text += "🎁 *Benefícios por Nível:*\n"
+    text += "🥉 Bronze: Acesso básico\n"
+    text += "🥈 Prata: 5% de desconto\n"
+    text += "🥇 Ouro: 10% de desconto\n"
+    
+    await query.edit_message_text(text, parse_mode="Markdown", reply_markup=get_main_menu_keyboard(False))
+
+async def admin_analytics(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Dashboard de analytics para admins"""
+    query = update.callback_query
+    await query.answer()
+    
+    if update.effective_user.id not in ADMIN_IDS:
+        await query.edit_message_text("Acesso negado.")
+        return
+    
+    db = SessionLocal()
+    since = datetime.utcnow() - timedelta(days=7)
+    
+    total_sales = db.query(Order).filter(Order.status == "paid", Order.created_at >= since).count()
+    total_revenue = sum(o.total_price for o in db.query(Order).filter(Order.status == "paid", Order.created_at >= since).all())
+    active_users = db.query(Order).filter(Order.created_at >= since).distinct(Order.user_id).count()
+    
+    db.close()
+    
+    text = f"📊 *Analytics Dashboard (7 dias)*\n\n"
+    text += f"📈 *Vendas:* {total_sales}\n"
+    text += f"💰 *Faturamento:* {format_currency(total_revenue)}\n"
+    text += f"👥 *Usuários Ativos:* {active_users}\n"
+    
+    await query.edit_message_text(text, parse_mode="Markdown")
 
 # ------------------- ADMIN -------------------
 async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -592,8 +1024,12 @@ async def send_telegram_message(chat_id: int, text: str):
 
 async def deliver_digital_product(order_id: int):
     db = SessionLocal()
+    release_expired_reservations(db)
     order = db.query(Order).filter(Order.id == order_id).first()
     if not order:
+        return
+    if order.status != "paid":
+        db.close()
         return
     user = db.query(User).filter(User.id == order.user_id).first()
     if not user:
@@ -609,6 +1045,9 @@ async def deliver_digital_product(order_id: int):
                     await client.post(url, data=data, files=files)
         else:
             await send_telegram_message(user.telegram_id, f"✅ Seu pedido #{order.id} foi confirmado! Em breve você receberá mais informações.")
+    order.delivery_status = "delivered"
+    order.delivered_at = datetime.utcnow()
+    db.commit()
     db.close()
 
 @app_webhook.get("/")
@@ -631,15 +1070,19 @@ async def root_post(request: Request, background_tasks: BackgroundTasks):
         # Se o pagamento foi confirmado
         if status == "paid" and order_id:
             db = SessionLocal()
+            release_expired_reservations(db)
             # Tenta buscar pelo ID do pedido
             order = db.query(Order).filter(Order.id == int(order_id)).first()
             
             if order and order.status != "paid":
                 order.status = "paid"
                 order.payment_id = payload.get("id") or str(order_id)
+                order.delivery_status = "processing"
                 db.commit()
                 background_tasks.add_task(deliver_digital_product, order.id)
-                await send_telegram_message(order.user.telegram_id, f"🎉 Pagamento confirmado! Pedido #{order.id} foi aprovado.")
+                user = db.query(User).filter(User.id == order.user_id).first()
+                if user:
+                    await send_telegram_message(user.telegram_id, f"🎉 Pagamento confirmado! Pedido #{order.id} foi aprovado.")
                 logging.info(f"✅ Pagamento confirmado para pedido #{order.id}")
             else:
                 logging.info(f"Pedido #{order_id} já estava pago ou não encontrado")
@@ -668,8 +1111,38 @@ async def sillientpay_webhook_get():
     return {"status": "ok", "message": "Webhook SillientPay está ativo. Use POST para enviar eventos."}
 
 @app_webhook.options("/webhook/sillientpay")
-async def sillientpay_options():
+async def sillientpay_webhook_options():
     return {}
+
+@app_webhook.post("/webhook/sillientpay")
+async def sillientpay_webhook(request: Request, background_tasks: BackgroundTasks):
+    try:
+        payload = await request.json()
+        logging.info(f"✅ Webhook SillientPay (POST) recebido: {payload}")
+        
+        event = payload.get("event")
+        logging.info(f"Evento: {event}")
+        
+        if event == "payment.succeeded":
+            payment_id = payload.get("data", {}).get("id")
+            db = SessionLocal()
+            release_expired_reservations(db)
+            order = db.query(Order).filter(Order.payment_id == payment_id).first()
+            if order and order.status != "paid":
+                order.status = "paid"
+                order.delivery_status = "processing"
+                db.commit()
+                background_tasks.add_task(deliver_digital_product, order.id)
+                user_id = order.user_id
+                user = db.query(User).filter(User.id == user_id).first()
+                if user:
+                    await send_telegram_message(user.telegram_id, f"🎉 Pagamento confirmado! Pedido #{order.id} foi aprovado.")
+                logging.info(f"✅ Pagamento confirmado para pedido #{order.id}")
+            db.close()
+        return {"status": "ok", "message": "Webhook processado com sucesso"}
+    except Exception as e:
+        logging.error(f"❌ Erro no webhook: {str(e)}")
+        return {"status": "error", "message": str(e)}
 
 @app_webhook.put("/webhook/sillientpay")
 async def sillientpay_webhook_put(request: Request, background_tasks: BackgroundTasks):
@@ -684,12 +1157,17 @@ async def sillientpay_webhook_put(request: Request, background_tasks: Background
         if event == "payment.succeeded":
             payment_id = payload.get("data", {}).get("id")
             db = SessionLocal()
+            release_expired_reservations(db)
             order = db.query(Order).filter(Order.payment_id == payment_id).first()
             if order and order.status != "paid":
                 order.status = "paid"
+                order.delivery_status = "processing"
                 db.commit()
                 background_tasks.add_task(deliver_digital_product, order.id)
-                await send_telegram_message(order.user.telegram_id, f"🎉 Pagamento confirmado! Pedido #{order.id} foi aprovado.")
+                user_id = order.user_id
+                user = db.query(User).filter(User.id == user_id).first()
+                if user:
+                    await send_telegram_message(user.telegram_id, f"🎉 Pagamento confirmado! Pedido #{order.id} foi aprovado.")
                 logging.info(f"✅ Pagamento confirmado para pedido #{order.id}")
             db.close()
         return {"status": "ok", "message": "Webhook processado com sucesso"}
@@ -710,42 +1188,22 @@ async def sillientpay_webhook_patch(request: Request, background_tasks: Backgrou
         if event == "payment.succeeded":
             payment_id = payload.get("data", {}).get("id")
             db = SessionLocal()
+            release_expired_reservations(db)
             order = db.query(Order).filter(Order.payment_id == payment_id).first()
             if order and order.status != "paid":
                 order.status = "paid"
+                order.delivery_status = "processing"
                 db.commit()
                 background_tasks.add_task(deliver_digital_product, order.id)
-                await send_telegram_message(order.user.telegram_id, f"🎉 Pagamento confirmado! Pedido #{order.id} foi aprovado.")
+                user_id = order.user_id
+                user = db.query(User).filter(User.id == user_id).first()
+                if user:
+                    await send_telegram_message(user.telegram_id, f"🎉 Pagamento confirmado! Pedido #{order.id} foi aprovado.")
                 logging.info(f"✅ Pagamento confirmado para pedido #{order.id}")
             db.close()
         return {"status": "ok", "message": "Webhook processado com sucesso"}
     except Exception as e:
         logging.error(f"❌ Erro no webhook (PATCH): {str(e)}")
-        return {"status": "error", "message": str(e)}
-
-@app_webhook.post("/webhook/sillientpay")
-async def sillientpay_webhook(request: Request, background_tasks: BackgroundTasks):
-    try:
-        payload = await request.json()
-        logging.info(f"✅ Webhook SillientPay (POST) recebido: {payload}")
-        
-        event = payload.get("event")
-        logging.info(f"Evento: {event}")
-        
-        if event == "payment.succeeded":
-            payment_id = payload.get("data", {}).get("id")
-            db = SessionLocal()
-            order = db.query(Order).filter(Order.payment_id == payment_id).first()
-            if order and order.status != "paid":
-                order.status = "paid"
-                db.commit()
-                background_tasks.add_task(deliver_digital_product, order.id)
-                await send_telegram_message(order.user.telegram_id, f"🎉 Pagamento confirmado! Pedido #{order.id} foi aprovado.")
-                logging.info(f"✅ Pagamento confirmado para pedido #{order.id}")
-            db.close()
-        return {"status": "ok", "message": "Webhook processado com sucesso"}
-    except Exception as e:
-        logging.error(f"❌ Erro no webhook: {str(e)}")
         return {"status": "error", "message": str(e)}
 
 def run_webhook():
@@ -765,63 +1223,45 @@ def create_test_products():
     # Produtos de teste
     test_products = [
         Product(
-            name="📘 Python Masterclass",
-            description="Curso completo de Python com 100+ aulas práticas",
+            name="CC FULL BASIC",
+            description="Pacote básico com informações completas",
             price=49.99,
             is_available=True
         ),
         Product(
-            name="🚀 Desenvolvimento Web com React",
-            description="Aprenda React do zero ao avançado",
+            name="CC FULL GOLD",
+            description="Pacote gold com dados premium",
             price=59.99,
             is_available=True
         ),
         Product(
-            name="🗄️ SQL e Banco de Dados",
-            description="Domine SQL, PostgreSQL e design de databases",
+            name="CC FULL BUSINESS",
+            description="Pacote business para empresas",
             price=44.99,
             is_available=True
         ),
         Product(
-            name="📱 Desenvolvimento Mobile com Flutter",
-            description="Crie apps para iOS e Android com Flutter",
+            name="CC FULL INFINITE",
+            description="Pacote infinite com acesso ilimitado",
             price=54.99,
             is_available=True
         ),
         Product(
-            name="🤖 Machine Learning com Python",
-            description="Introdução a Machine Learning e IA",
+            name="CC FULL BLACK",
+            description="Pacote black exclusivo VIP",
             price=64.99,
             is_available=True
         ),
         Product(
-            name="🔐 Segurança Web e Hacking Ético",
-            description="Aprenda segurança ofensiva e defensiva",
+            name="DOC FAKE APP",
+            description="Aplicativo para documentos personalizados",
             price=69.99,
             is_available=True
         ),
         Product(
-            name="⚡ Node.js e Express",
-            description="Backend escalável com Node.js",
-            price=54.99,
-            is_available=True
-        ),
-        Product(
-            name="🎨 UI/UX Design Completo",
-            description="Design responsivo e user experience",
-            price=39.99,
-            is_available=True
-        ),
-        Product(
-            name="📊 Data Science com Pandas",
-            description="Análise de dados com Python",
-            price=59.99,
-            is_available=True
-        ),
-        Product(
-            name="🔗 Docker e Kubernetes",
-            description="Containerização e orquestração de aplicações",
-            price=64.99,
+            name="COMPROVANTE FK",
+            description="Comprovantes personalizados diversos",
+            price=15.99,
             is_available=True
         ),
     ]
@@ -832,7 +1272,7 @@ def create_test_products():
     
     db.commit()
     db.close()
-    logging.info("✅ 10 produtos de teste criados com sucesso!")
+    logging.info("✅ 7 produtos de teste criados com sucesso!")
 
 # ======================= MAIN =======================
 def main():
@@ -846,9 +1286,14 @@ def main():
     # Cria produtos de teste
     create_test_products()
     
-    app = Application.builder().token(BOT_TOKEN).build()
+    # Funcao para deletar webhook no post_init
+    async def post_init(application):
+        await application.bot.delete_webhook(drop_pending_updates=True)
+        logging.info("Webhook deletado - pronto para polling")
+    
+    app = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
     app.bot_data["admin_ids"] = ADMIN_IDS
-
+    
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("admin", admin_panel))
     app.add_handler(CommandHandler("teste", teste))  # Comando de teste
@@ -856,7 +1301,7 @@ def main():
     app.add_handler(CommandHandler("pagar", pagar))  # Simular aprovação de pagamento
     app.add_handler(CallbackQueryHandler(catalog, pattern="^catalog$"))
     app.add_handler(CallbackQueryHandler(product_detail, pattern=r"^product_(\d+)$"))
-    app.add_handler(CallbackQueryHandler(add_to_cart, pattern=r"^add_to_cart_(\d+)$"))
+    app.add_handler(CallbackQueryHandler(add_to_cart, pattern=r"^add_to_cart_"))
     app.add_handler(CallbackQueryHandler(view_cart, pattern="^view_cart$"))
     app.add_handler(CallbackQueryHandler(clear_cart, pattern="^clear_cart$"))
     app.add_handler(CallbackQueryHandler(checkout, pattern="^checkout$"))
@@ -864,8 +1309,12 @@ def main():
     app.add_handler(CallbackQueryHandler(support, pattern="^support$"))
     app.add_handler(CallbackQueryHandler(my_account, pattern="^my_account$"))
     app.add_handler(CallbackQueryHandler(main_menu, pattern="^main_menu$"))
+    app.add_handler(CallbackQueryHandler(categories_menu, pattern="^categories$"))
+    app.add_handler(CallbackQueryHandler(show_categories, pattern=r"^category_(\d+)$"))
+    app.add_handler(CallbackQueryHandler(view_loyalty, pattern="^view_loyalty$"))
     app.add_handler(CallbackQueryHandler(admin_panel, pattern="^admin_panel$"))
     app.add_handler(CallbackQueryHandler(admin_orders, pattern="^admin_orders$"))
+    app.add_handler(CallbackQueryHandler(admin_analytics, pattern="^admin_analytics$"))
 
     conv_handler = ConversationHandler(
         entry_points=[CallbackQueryHandler(admin_add_product_start, pattern="^admin_add_product$")],
@@ -881,7 +1330,7 @@ def main():
     app.add_handler(conv_handler)
 
     logging.info("Bot iniciado (polling) - webhook rodando em background...")
-    app.run_polling()
+    app.run_polling(drop_pending_updates=True)
 
 if __name__ == "__main__":
     main()

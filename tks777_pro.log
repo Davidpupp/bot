@@ -1,0 +1,621 @@
+2026-04-15 22:50:30,880 - __main__ - INFO -  Iniciando TKS777 PRO...
+2026-04-15 22:50:30,881 - __main__ - INFO - Webhook iniciado na porta 8002
+2026-04-15 22:50:30,936 - __main__ - INFO - 7 produtos criados com sucesso!
+2026-04-15 22:50:31,872 - __main__ - INFO -  TKS777 PRO iniciado com sucesso!
+2026-04-15 22:50:32,817 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/getMe "HTTP/1.1 200 OK"
+2026-04-15 22:50:33,126 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/deleteWebhook "HTTP/1.1 200 OK"
+2026-04-15 22:50:33,128 - telegram.ext.Application - INFO - Application started
+2026-04-15 22:50:37,766 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/getUpdates "HTTP/1.1 409 Conflict"
+2026-04-15 22:50:37,768 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 161, in network_retry_loop
+    await do_action()
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 154, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 672, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 4865, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 704, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 370, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 733, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-04-15 22:50:43,495 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/getUpdates "HTTP/1.1 409 Conflict"
+2026-04-15 22:50:43,496 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 161, in network_retry_loop
+    await do_action()
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 154, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 672, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 4865, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 704, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 370, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 733, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-04-15 22:50:50,476 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/getUpdates "HTTP/1.1 409 Conflict"
+2026-04-15 22:50:50,477 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 161, in network_retry_loop
+    await do_action()
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 154, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 672, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 4865, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 704, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 370, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 733, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-04-15 22:50:56,371 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/getUpdates "HTTP/1.1 409 Conflict"
+2026-04-15 22:50:56,372 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 161, in network_retry_loop
+    await do_action()
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 154, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 672, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 4865, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 704, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 370, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 733, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-04-15 22:51:03,966 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/getUpdates "HTTP/1.1 409 Conflict"
+2026-04-15 22:51:03,967 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 161, in network_retry_loop
+    await do_action()
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 154, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 672, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 4865, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 704, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 370, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 733, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-04-15 22:51:13,716 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/getUpdates "HTTP/1.1 409 Conflict"
+2026-04-15 22:51:13,717 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 161, in network_retry_loop
+    await do_action()
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 154, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 672, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 4865, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 704, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 370, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 733, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-04-15 22:51:26,067 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/getUpdates "HTTP/1.1 409 Conflict"
+2026-04-15 22:51:26,068 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 161, in network_retry_loop
+    await do_action()
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 154, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 672, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 4865, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 704, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 370, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 733, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-04-15 22:51:42,247 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/getUpdates "HTTP/1.1 409 Conflict"
+2026-04-15 22:51:42,249 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 161, in network_retry_loop
+    await do_action()
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 154, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 672, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 4865, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 704, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 370, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 733, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-04-15 22:52:03,997 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/getUpdates "HTTP/1.1 409 Conflict"
+2026-04-15 22:52:03,998 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 161, in network_retry_loop
+    await do_action()
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 154, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 672, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 4865, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 704, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 370, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 733, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-04-15 22:52:34,317 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8783109233:AAGFaneNYd4m377qdBO192ST2uWG5y3AxFA/getUpdates "HTTP/1.1 409 Conflict"
+2026-04-15 22:52:34,318 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 161, in network_retry_loop
+    await do_action()
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_utils\networkloop.py", line 154, in do_action
+    action_cb_task.result()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_updater.py", line 340, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 672, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 4865, in get_updates
+    await self._post(
+    ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    ),
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 704, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\ext\_extbot.py", line 370, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\_bot.py", line 733, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 198, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\davip\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\telegram\request\_baserequest.py", line 375, in _request_wrapper
+    raise exception
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2026-04-15 22:52:51,178 - __main__ - INFO -  Iniciando TKS777 PRO...
+2026-04-15 22:52:51,179 - __main__ - INFO - Webhook iniciado na porta 8002
+2026-04-15 22:52:52,086 - __main__ - INFO -  TKS777 PRO iniciado com sucesso!
+2026-04-15 22:52:54,439 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getMe "HTTP/1.1 200 OK"
+2026-04-15 22:52:54,747 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/deleteWebhook "HTTP/1.1 200 OK"
+2026-04-15 22:52:54,749 - telegram.ext.Application - INFO - Application started
+2026-04-15 22:53:05,497 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:53:15,738 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:53:19,569 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:53:21,921 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/sendPhoto "HTTP/1.1 200 OK"
+2026-04-15 22:53:24,649 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:53:24,988 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-04-15 22:53:25,258 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/editMessageText "HTTP/1.1 400 Bad Request"
+2026-04-15 22:53:25,259 - __main__ - ERROR - Erro no catalog: There is no text in the message to edit
+2026-04-15 22:53:34,868 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:53:45,098 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:53:55,321 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:54:16,306 - __main__ - INFO -  Iniciando TKS777 PRO...
+2026-04-15 22:54:16,307 - __main__ - INFO - Webhook iniciado na porta 8002
+2026-04-15 22:54:17,448 - __main__ - INFO -  TKS777 PRO iniciado com sucesso!
+2026-04-15 22:54:18,329 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getMe "HTTP/1.1 200 OK"
+2026-04-15 22:54:18,549 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/deleteWebhook "HTTP/1.1 200 OK"
+2026-04-15 22:54:18,551 - telegram.ext.Application - INFO - Application started
+2026-04-15 22:54:29,340 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:54:39,709 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:54:40,489 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:54:42,643 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/sendPhoto "HTTP/1.1 200 OK"
+2026-04-15 22:54:44,822 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:54:45,168 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-04-15 22:54:45,415 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/editMessageText "HTTP/1.1 400 Bad Request"
+2026-04-15 22:54:45,416 - __main__ - ERROR - Erro no catalog: There is no text in the message to edit
+2026-04-15 22:54:55,070 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:55:05,410 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:55:15,649 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:55:25,884 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:56:05,220 - __main__ - INFO -  Iniciando TKS777 PRO...
+2026-04-15 22:56:05,221 - __main__ - INFO - Webhook iniciado na porta 8002
+2026-04-15 22:56:06,345 - __main__ - INFO -  TKS777 PRO iniciado com sucesso!
+2026-04-15 22:56:07,062 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getMe "HTTP/1.1 200 OK"
+2026-04-15 22:56:07,300 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/deleteWebhook "HTTP/1.1 200 OK"
+2026-04-15 22:56:07,302 - telegram.ext.Application - INFO - Application started
+2026-04-15 22:56:18,100 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:56:28,350 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:56:32,251 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:56:34,060 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/sendPhoto "HTTP/1.1 200 OK"
+2026-04-15 22:56:36,781 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:56:37,165 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-04-15 22:56:37,391 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/editMessageText "HTTP/1.1 400 Bad Request"
+2026-04-15 22:56:37,392 - __main__ - ERROR - Erro no catalog: There is no text in the message to edit
+2026-04-15 22:56:47,021 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:56:57,251 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:57:07,481 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:57:24,999 - __main__ - INFO -  Iniciando TKS777 PRO...
+2026-04-15 22:57:25,000 - __main__ - INFO - Webhook iniciado na porta 8002
+2026-04-15 22:57:26,045 - __main__ - INFO -  TKS777 PRO iniciado com sucesso!
+2026-04-15 22:57:26,923 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getMe "HTTP/1.1 200 OK"
+2026-04-15 22:57:27,141 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/deleteWebhook "HTTP/1.1 200 OK"
+2026-04-15 22:57:27,144 - telegram.ext.Application - INFO - Application started
+2026-04-15 22:57:37,773 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:57:48,025 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:57:48,352 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:57:50,162 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/sendPhoto "HTTP/1.1 200 OK"
+2026-04-15 22:57:52,299 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:57:52,725 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-04-15 22:57:53,011 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/editMessageText "HTTP/1.1 400 Bad Request"
+2026-04-15 22:57:53,012 - __main__ - ERROR - Erro no catalog: There is no text in the message to edit
+2026-04-15 22:57:53,852 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:57:54,199 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-04-15 22:57:54,472 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/editMessageText "HTTP/1.1 400 Bad Request"
+2026-04-15 22:57:54,473 - __main__ - ERROR - Erro no catalog: There is no text in the message to edit
+2026-04-15 22:57:54,872 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:57:55,221 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-04-15 22:57:55,442 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/editMessageText "HTTP/1.1 400 Bad Request"
+2026-04-15 22:57:55,443 - __main__ - ERROR - Erro no view_cart: There is no text in the message to edit
+2026-04-15 22:58:00,415 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:58:00,780 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/answerCallbackQuery "HTTP/1.1 200 OK"
+2026-04-15 22:58:01,042 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/editMessageText "HTTP/1.1 400 Bad Request"
+2026-04-15 22:58:01,043 - __main__ - ERROR - Erro no catalog: There is no text in the message to edit
+2026-04-15 22:58:10,632 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:58:20,893 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:58:31,133 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:58:41,571 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:58:51,813 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
+2026-04-15 22:59:02,054 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot8633859972:AAHQfiWp7XGjGtFSGGzveznFsLex2XABQHw/getUpdates "HTTP/1.1 200 OK"
