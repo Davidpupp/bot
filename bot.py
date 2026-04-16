@@ -203,7 +203,6 @@ def release_expired_reservations(db):
             if product and product.stock is not None:
                 product.stock += item.quantity
         order.status = "cancelled"
-        order.delivery_status = "cancelled"
     db.commit()
 
 def get_main_menu_keyboard(is_admin: bool = False):
@@ -452,7 +451,6 @@ async def checkout(update: Update, context: ContextTypes.DEFAULT_TYPE):
         total_price=total,
         status="reserved",
         reserved_until=datetime.utcnow() + timedelta(minutes=30),
-        delivery_status="pending",
     )
     db.add(order)
     db.commit()
@@ -522,7 +520,6 @@ async def receive_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Marcar pedido como pago
     order.status = "paid"
-    order.delivery_status = "processing"
     db.commit()
     db.close()
     
